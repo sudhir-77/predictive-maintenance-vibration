@@ -1,0 +1,183 @@
+{
+  "project": "predictive-maintenance-ops",
+  "success_criteria": [
+    {
+      "name": "FD001 test RUL RMSE",
+      "value": 15.110356,
+      "op": "<=",
+      "threshold": 18.0,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "FD003 test RUL RMSE",
+      "value": 15.980509,
+      "op": "<=",
+      "threshold": 20.0,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Alert lead time",
+      "value": 1.0,
+      "op": ">=",
+      "threshold": 0.8,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "False alerts",
+      "value": 0.0,
+      "op": "<=",
+      "threshold": 0.1,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Test coverage of src/",
+      "value": 90.0,
+      "op": ">=",
+      "threshold": 70.0,
+      "threshold_high": null,
+      "passed": true
+    }
+  ],
+  "metrics": {
+    "datasets": [
+      "FD001",
+      "FD003"
+    ],
+    "quick": false,
+    "fd001": {
+      "val_truncated_rmse": 13.961064,
+      "blend_alpha_lgbm": 1.0,
+      "lgbm_iterations": 306,
+      "cnn_epochs": 14,
+      "n_features": 144,
+      "calibrator_lgbm_intercept": -3.112015,
+      "calibrator_lgbm_slope": 1.090897,
+      "calibrator_cnn_intercept": -3.825188,
+      "calibrator_cnn_slope": 1.075635,
+      "alert_policy": {
+        "rul_threshold": 24.0,
+        "persist_cycles": 2,
+        "smooth_window": 11,
+        "z_threshold": 6.0,
+        "iforest_threshold": 0.062597,
+        "anomaly_margin": 24.0,
+        "anomaly_persist": 4,
+        "uses_anomaly": true
+      },
+      "alert_tune_passed": true,
+      "constant_mean_rul": 86.829286,
+      "piecewise_sensor": "s11",
+      "baseline_val_lead_time_fraction": 0.9,
+      "baseline_val_false_alerts_per_engine": 0.25,
+      "test_rmse": 15.110356,
+      "test_rmse_lgbm": 15.110356,
+      "test_rmse_cnn": 20.059371,
+      "test_rmse_baseline_constant": 43.067036,
+      "test_rmse_baseline_piecewise": 23.92749,
+      "beats_constant_baseline": true,
+      "n_test_engines": 100,
+      "val_lead_time_fraction": 1.0,
+      "val_false_alerts_per_engine": 0.0,
+      "val_median_lead_time": 38.5
+    },
+    "fd003": {
+      "val_truncated_rmse": 19.194374,
+      "blend_alpha_lgbm": 1.0,
+      "lgbm_iterations": 66,
+      "cnn_epochs": 20,
+      "n_features": 154,
+      "calibrator_lgbm_intercept": 0.0,
+      "calibrator_lgbm_slope": 1.0,
+      "calibrator_cnn_intercept": 4.950716,
+      "calibrator_cnn_slope": 0.843714,
+      "alert_policy": {
+        "rul_threshold": 36.0,
+        "persist_cycles": 2,
+        "smooth_window": 5,
+        "z_threshold": 6.0,
+        "iforest_threshold": 1000000000000.0,
+        "anomaly_margin": 24.0,
+        "anomaly_persist": 4,
+        "uses_anomaly": true
+      },
+      "alert_tune_passed": true,
+      "constant_mean_rul": 93.143204,
+      "piecewise_sensor": "s11",
+      "baseline_val_lead_time_fraction": 0.75,
+      "baseline_val_false_alerts_per_engine": 0.05,
+      "test_rmse": 15.980509,
+      "test_rmse_lgbm": 15.980509,
+      "test_rmse_cnn": 21.357611,
+      "test_rmse_baseline_constant": 45.069548,
+      "test_rmse_baseline_piecewise": 26.903665,
+      "beats_constant_baseline": true,
+      "n_test_engines": 100,
+      "val_lead_time_fraction": 1.0,
+      "val_false_alerts_per_engine": 0.0,
+      "val_median_lead_time": 30.0
+    },
+    "alerts": {
+      "lead_time_fraction": 1.0,
+      "lead_time_percent": 100.0,
+      "median_lead_time": 34.5,
+      "mean_lead_time": 35.35,
+      "false_alerts_per_engine": 0.0,
+      "false_alert_cycles_per_engine": 0.0,
+      "n_engines": 40.0,
+      "definition": "Lead time is true RUL at the first alert. A false alert is an episode that starts while true RUL is above 50 cycles. The reported rate is false episodes divided by validation engines."
+    },
+    "headline_text": {
+      "fd001_test_rmse": "15.11",
+      "fd003_test_rmse": "15.98",
+      "fd001_baseline_constant_rmse": "43.07",
+      "fd003_baseline_constant_rmse": "45.07",
+      "alert_median_lead_cycles": "34.50",
+      "alert_engines_percent": "100.00",
+      "false_alerts_per_engine": "0.0000"
+    }
+  },
+  "baseline": {
+    "fd001": {
+      "constant_mean_rul": 86.829286,
+      "test_rmse_constant": 43.067036,
+      "test_rmse_piecewise": 23.92749,
+      "val_alert_lead_time_fraction": 0.9,
+      "val_false_alerts_per_engine": 0.25
+    },
+    "fd003": {
+      "constant_mean_rul": 93.143204,
+      "test_rmse_constant": 45.069548,
+      "test_rmse_piecewise": 26.903665,
+      "val_alert_lead_time_fraction": 0.75,
+      "val_false_alerts_per_engine": 0.05
+    }
+  },
+  "splits": {
+    "FD001": {
+      "train": 80,
+      "val": 20,
+      "test": 100
+    },
+    "FD003": {
+      "train": 80,
+      "val": 20,
+      "test": 100
+    }
+  },
+  "seeds": [
+    0
+  ],
+  "hardware": {
+    "cpu": "Intel64 Family 6 Model 141 Stepping 1, GenuineIntel",
+    "ram_gb": 15.73,
+    "gpu": null,
+    "python": "3.12.10",
+    "os": "Windows-11-10.0.26200-SP0",
+    "peak_rss_gb": 0.9708
+  },
+  "runtime_seconds": 76.087
+}
