@@ -52,7 +52,7 @@ These are simulated engines, not a fleet maintenance program. Alert lead time an
 
 NASA C-MAPSS Turbofan Engine Degradation Simulation, subsets FD001 and FD003, from the NASA Prognostics Center of Excellence: https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/
 
-The files are NASA open data and are in the public domain. The downloader caches them under `data/cmapss/` and checks row counts plus SHA-256.
+**License:** NASA open data, public domain (U.S. government work). There is no usage restriction on the files. The downloader caches them under `data/cmapss/` and checks row counts plus SHA-256.
 
 ## Evaluation artifacts
 
@@ -93,8 +93,8 @@ Validation engines: median lead time 34.5 cycles, mean lead time 35.35 cycles, 0
 | FD001 | 15.110356 | 15.110356 | 20.059371 | 43.067036 | 23.92749 |
 | FD003 | 15.980509 | 15.980509 | 21.357611 | 45.069548 | 26.903665 |
 
-Runtime seconds: 76.087.
-Peak RSS GB: 0.9708.
+Runtime seconds: 78.706.
+Peak RSS GB: 1.0109.
 
 Every success criterion passed.
 <!-- RESULTS_END -->
