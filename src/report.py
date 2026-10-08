@@ -62,6 +62,20 @@ def render_results_markdown(metrics: dict) -> str:
                 f"{block.get('test_rmse_cnn')} | {block.get('test_rmse_baseline_constant')} | "
                 f"{block.get('test_rmse_baseline_piecewise')} |"
             )
+    vibration = metrics["metrics"].get("vibration")
+    if vibration:
+        lines.append("")
+        lines.append("| Model | Held-out macro-F1 |")
+        lines.append("|---|---:|")
+        lines.append(f"| 1D CNN | {vibration.get('cnn_test_macro_f1')} |")
+        lines.append(f"| Random forest | {vibration.get('baseline_test_macro_f1')} |")
+        lines.append("")
+        lines.append(
+            f"Outer-race BPFO theory {vibration.get('bpfo_hz_theory')} Hz, "
+            f"detected {vibration.get('bpfo_hz_detected')} Hz, "
+            f"relative error {vibration.get('bpfo_rel_error')}."
+        )
+        lines.append(f"Cross-split overlapping windows: {vibration.get('overlap_windows')}.")
     lines.append("")
     lines.append(f"Runtime seconds: {metrics['runtime_seconds']}.")
     peak = metrics["hardware"].get("peak_rss_gb")
@@ -90,8 +104,46 @@ def update_readme(path: Path, metrics: dict) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def _vibration_resume(headline: dict) -> str:
+    cnn = headline["vibration_cnn_macro_f1"]
+    baseline = headline["vibration_baseline_macro_f1"]
+    bpfo = headline["vibration_bpfo_rel_error_percent"]
+    fd001 = headline["fd001_test_rmse"]
+    overlap = headline["vibration_overlap_windows"]
+    load_hp = headline["vibration_test_load_hp"]
+    n_classes = headline["vibration_n_classes"]
+    return f"""# Resume notes
+
+## Bullets
+
+- Classified {n_classes} bearing fault conditions from accelerometer signals with a one-dimensional CNN at {cnn} macro-F1 on an unseen motor load vs. {baseline} for a spectral-feature random forest.
+- Built FFT and envelope-spectrum features; the detected outer-race fault peak matched bearing-geometry BPFO within {bpfo}%.
+- Predicted remaining useful life on NASA C-MAPSS engine telemetry with LightGBM and a one-dimensional CNN, reaching {fd001} RMSE (cycles) on the official FD001 test set.
+- Assigned each CWRU recording to one motor-load split so cross-split sample overlap is {overlap} windows. The held-out load is {load_hp} hp.
+
+## Skills and tools
+
+Python, SQL, DuckDB, NumPy, SciPy, scikit-learn, PyTorch, LightGBM, FFT, Hilbert envelope spectrum, bearing fault frequencies, one-dimensional CNN, random forest, time series, predictive maintenance.
+
+## Summary
+
+This project classifies drive-end bearing faults from public accelerometer recordings and predicts remaining useful life on NASA turbofan telemetry. Windows are split by motor load so neighboring samples cannot leak into the test set, and an envelope spectrum is checked against the outer-race fault frequency from the bearing geometry.
+
+## GitHub description
+
+Classify CWRU bearing faults from vibration spectra and a 1D CNN, on a turbofan RUL pipeline.
+"""
+
+
 def render_resume_notes(metrics: dict) -> str:
     headline = metrics["metrics"]["headline_text"]
+    if "vibration_cnn_macro_f1" in headline:
+        text = _vibration_resume(headline)
+        lowered = text.lower()
+        for word in BANNED:
+            if word.lower() in lowered:
+                raise ValueError(f"resume notes contain banned wording: {word}")
+        return text
     fd001 = headline["fd001_test_rmse"]
     fd003 = headline["fd003_test_rmse"]
     baseline = headline["fd003_baseline_constant_rmse"]

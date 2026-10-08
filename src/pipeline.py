@@ -22,13 +22,47 @@ from src.report import render_resume_notes, update_readme, write_json
 from src.train_eval import evaluate_dataset
 
 
-def measure_coverage(root: Path) -> tuple[float | None, int, str]:
+def parse_coverage_table(text: str) -> dict[str, float | None]:
+    """Sum statement coverage for src/ and vibration/ from a pytest-cov table."""
+    src_stmts = src_miss = vib_stmts = vib_miss = 0
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) < 4:
+            continue
+        name = parts[0].replace("\\", "/")
+        if not (name.startswith("src/") or name.startswith("vibration/")):
+            continue
+        try:
+            stmts = int(parts[1])
+            miss = int(parts[2])
+        except ValueError:
+            continue
+        if name.startswith("src/"):
+            src_stmts += stmts
+            src_miss += miss
+        else:
+            vib_stmts += stmts
+            vib_miss += miss
+
+    def percent(stmts: int, miss: int) -> float | None:
+        if stmts <= 0:
+            return None
+        return 100.0 * (stmts - miss) / stmts
+
+    combined = None
+    if src_stmts > 0 and vib_stmts > 0:
+        combined = 100.0 * (src_stmts + vib_stmts - src_miss - vib_miss) / (src_stmts + vib_stmts)
+    return {"src": percent(src_stmts, src_miss), "vibration": percent(vib_stmts, vib_miss), "combined": combined}
+
+
+def measure_coverage(root: Path) -> tuple[float | None, int, str, dict[str, float | None]]:
     env = os.environ.copy()
     command = [
         sys.executable,
         "-m",
         "pytest",
         "--cov=src",
+        "--cov=vibration",
         "--cov-report=term-missing",
         "-q",
         "-o",
@@ -38,9 +72,12 @@ def measure_coverage(root: Path) -> tuple[float | None, int, str]:
     ]
     completed = subprocess.run(command, cwd=root, capture_output=True, text=True, env=env)
     text = completed.stdout + "\n" + completed.stderr
-    match = re.search(r"^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?)%", text, re.MULTILINE)
-    percent = float(match.group(1)) if match else None
-    return percent, int(completed.returncode), text
+    parts = parse_coverage_table(text)
+    percent = parts["src"]
+    if percent is None:
+        match = re.search(r"^TOTAL\s+\d+\s+\d+\s+(\d+(?:\.\d+)?)%", text, re.MULTILINE)
+        percent = float(match.group(1)) if match else None
+    return percent, int(completed.returncode), text, parts
 
 
 def run_pipeline(
@@ -101,10 +138,11 @@ def run_pipeline(
     write_plots(output_dir, fd001_test, fd003_test, cycles, engines, payload)
 
     coverage = None
+    coverage_parts: dict[str, float | None] = {"src": None, "vibration": None, "combined": None}
     pytest_code = 0
     if not skip_coverage:
         print("measuring test coverage")
-        coverage, pytest_code, log_text = measure_coverage(root)
+        coverage, pytest_code, log_text, coverage_parts = measure_coverage(root)
         (output_dir / "pytest_coverage.log").write_text(log_text, encoding="utf-8")
         print(log_text[-2000:])
     payload, engines = assemble_metrics(
@@ -118,6 +156,8 @@ def run_pipeline(
         coverage=coverage,
         quick=quick,
     )
+    payload["metrics"]["coverage_src_percent"] = coverage
+    payload["metrics"]["coverage_src_and_vibration_percent"] = coverage_parts.get("combined")
     if pytest_code != 0:
         for item in payload["success_criteria"]:
             if item["name"] == "Test coverage of src/":
