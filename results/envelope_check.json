@@ -1,0 +1,13 @@
+{
+  "bpfo_hz_theory": 107.304281,
+  "bpfo_hz_detected": 107.504477,
+  "rel_error": 0.001866,
+  "recording": "234",
+  "load_hp": 0,
+  "label": "or_021",
+  "rpm": 1796.0,
+  "sample_rate_hz": 12000,
+  "search_low_hz": 74.833333,
+  "search_high_hz": 149.666667,
+  "n_samples": 120000
+}

@@ -2,19 +2,19 @@
 
 ## Bullets
 
+- Classified 10 bearing fault conditions from accelerometer signals with a one-dimensional CNN at 0.9717 macro-F1 on an unseen motor load vs. 0.9668 for a spectral-feature random forest.
+- Built FFT and envelope-spectrum features; the detected outer-race fault peak matched bearing-geometry BPFO within 0.19%.
 - Predicted remaining useful life on NASA C-MAPSS engine telemetry with LightGBM and a one-dimensional CNN, reaching 15.11 RMSE (cycles) on the official FD001 test set.
-- Designed an alert policy combining RUL forecasts with control-chart and isolation-forest anomaly scores that warned 34.50 cycles ahead for 100.00% of engines at 0.0000 false alerts per engine.
-- On FD003, the same models reached 15.98 test RMSE (cycles), compared with 45.07 for a constant mean-RUL baseline.
-- Built the SQL feature layer in DuckDB and a static operations dashboard for alert review.
+- Assigned each CWRU recording to one motor-load split so cross-split sample overlap is 0 windows. The held-out load is 3 hp.
 
 ## Skills and tools
 
-Python, SQL, DuckDB, LightGBM, PyTorch, scikit-learn, pandas, statistics, anomaly detection, control charts, time series, predictive maintenance, matplotlib, Plotly.
+Python, SQL, DuckDB, NumPy, SciPy, scikit-learn, PyTorch, LightGBM, FFT, Hilbert envelope spectrum, bearing fault frequencies, one-dimensional CNN, random forest, time series, predictive maintenance.
 
 ## Summary
 
-This project predicts how many cycles a turbofan engine has left using NASA C-MAPSS sensor streams. It builds rolling features in SQL, compares gradient boosting with a one-dimensional convolutional network, and checks an alert rule against the actual failure times.
+This project classifies drive-end bearing faults from public accelerometer recordings and predicts remaining useful life on NASA turbofan telemetry. Windows are split by motor load so neighboring samples cannot leak into the test set, and an envelope spectrum is checked against the outer-race fault frequency from the bearing geometry.
 
 ## GitHub description
 
-Predict remaining useful life and failure alerts from NASA C-MAPSS turbofan telemetry.
+Classify CWRU bearing faults from vibration spectra and a 1D CNN, on a turbofan RUL pipeline.

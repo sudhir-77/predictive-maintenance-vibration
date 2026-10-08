@@ -112,7 +112,13 @@ Alert lead time is the fraction of validation engines whose first alert has `rul
 | FD003 test RUL RMSE | 15.980509 | <= | 20.0 | yes |
 | Alert lead time | 1.0 | >= | 0.8 | yes |
 | False alerts | 0.0 | <= | 0.1 | yes |
-| Test coverage of src/ | 90.0 | >= | 70.0 | yes |
+| Test coverage of src/ | 89.869484 | >= | 70.0 | yes |
+| Macro-F1 on held-out motor load (10 classes) | 0.971676 | >= | 0.9 | yes |
+| Best model vs. feature baseline | 0.971676 | >= | 0.95 | yes |
+| Envelope fault-frequency check | 0.001866 | <= | 0.02 | yes |
+| No leakage | 0.0 | <= | 0.0 | yes |
+| Parent project | 0.0 | <= | 0.02 | yes |
+| Test coverage of src/ and vibration/ | 90.147992 | >= | 75.0 | yes |
 
 Validation engines: median lead time 34.5 cycles, mean lead time 35.35 cycles, 0.0 false alert episodes per engine.
 
@@ -121,8 +127,16 @@ Validation engines: median lead time 34.5 cycles, mean lead time 35.35 cycles, 0
 | FD001 | 15.110356 | 15.110356 | 20.059371 | 43.067036 | 23.92749 |
 | FD003 | 15.980509 | 15.980509 | 21.357611 | 45.069548 | 26.903665 |
 
-Runtime seconds: 78.706.
-Peak RSS GB: 1.0109.
+| Model | Held-out macro-F1 |
+|---|---:|
+| 1D CNN | 0.971676 |
+| Random forest | 0.966768 |
+
+Outer-race BPFO theory 107.304281 Hz, detected 107.504477 Hz, relative error 0.001866.
+Cross-split overlapping windows: 0.
+
+Runtime seconds: 88.305.
+Peak RSS GB: 1.0032.
 
 Every success criterion passed.
 <!-- RESULTS_END -->

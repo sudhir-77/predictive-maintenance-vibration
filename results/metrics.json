@@ -1,5 +1,5 @@
 {
-  "project": "predictive-maintenance-ops",
+  "project": "predictive-maintenance-vibration",
   "success_criteria": [
     {
       "name": "FD001 test RUL RMSE",
@@ -35,9 +35,57 @@
     },
     {
       "name": "Test coverage of src/",
-      "value": 90.0,
+      "value": 89.869484,
       "op": ">=",
       "threshold": 70.0,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Macro-F1 on held-out motor load (10 classes)",
+      "value": 0.971676,
+      "op": ">=",
+      "threshold": 0.9,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Best model vs. feature baseline",
+      "value": 0.971676,
+      "op": ">=",
+      "threshold": 0.95,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Envelope fault-frequency check",
+      "value": 0.001866,
+      "op": "<=",
+      "threshold": 0.02,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "No leakage",
+      "value": 0.0,
+      "op": "<=",
+      "threshold": 0.0,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Parent project",
+      "value": 0.0,
+      "op": "<=",
+      "threshold": 0.02,
+      "threshold_high": null,
+      "passed": true
+    },
+    {
+      "name": "Test coverage of src/ and vibration/",
+      "value": 90.147992,
+      "op": ">=",
+      "threshold": 75.0,
       "threshold_high": null,
       "passed": true
     }
@@ -137,8 +185,85 @@
       "fd003_baseline_constant_rmse": "45.07",
       "alert_median_lead_cycles": "34.50",
       "alert_engines_percent": "100.00",
-      "false_alerts_per_engine": "0.0000"
-    }
+      "false_alerts_per_engine": "0.0000",
+      "vibration_cnn_macro_f1": "0.9717",
+      "vibration_baseline_macro_f1": "0.9668",
+      "vibration_best_macro_f1": "0.9717",
+      "vibration_bpfo_rel_error_percent": "0.19",
+      "vibration_overlap_windows": "0",
+      "vibration_test_load_hp": "3",
+      "vibration_n_classes": "10"
+    },
+    "coverage_src_percent": 89.869484,
+    "coverage_src_and_vibration_percent": 90.147992,
+    "vibration": {
+      "project": "predictive-maintenance-vibration",
+      "quick": false,
+      "n_classes": 10,
+      "class_names": [
+        "normal",
+        "ir_007",
+        "ir_014",
+        "ir_021",
+        "or_007",
+        "or_014",
+        "or_021",
+        "ball_007",
+        "ball_014",
+        "ball_021"
+      ],
+      "cnn_test_macro_f1": 0.971676,
+      "baseline_test_macro_f1": 0.966768,
+      "best_test_macro_f1": 0.971676,
+      "best_model": "cnn",
+      "cnn_val_macro_f1": 1.0,
+      "cnn_epochs_ran": 7,
+      "bpfo_hz_theory": 107.304281,
+      "bpfo_hz_detected": 107.504477,
+      "bpfo_rel_error": 0.001866,
+      "bpfo_rel_error_percent": 0.186569,
+      "overlap_windows": 0,
+      "test_load_hp": 3,
+      "device": "cpu",
+      "n_train_windows": 970,
+      "n_val_windows": 110,
+      "n_test_windows": 360,
+      "n_train_recordings": 30,
+      "n_val_recordings": 10,
+      "n_test_recordings": 10,
+      "window_length": 2048,
+      "sample_rate_hz": 12000,
+      "feature_names": [
+        "rms",
+        "kurtosis",
+        "crest_factor",
+        "fft_band_0",
+        "fft_band_1",
+        "fft_band_2",
+        "fft_band_3",
+        "fft_band_4",
+        "fft_band_5",
+        "fft_band_6",
+        "fft_band_7",
+        "env_band_0",
+        "env_band_1",
+        "env_band_2",
+        "env_band_3",
+        "env_band_4",
+        "env_band_5",
+        "env_band_6",
+        "env_band_7",
+        "env_shaft",
+        "env_bpfo",
+        "env_bpfo_2",
+        "env_bpfi",
+        "env_bpfi_2",
+        "env_bsf",
+        "env_bsf_2"
+      ],
+      "envelope_recording": "234"
+    },
+    "parent_headline_rel_deviation": 0.0
   },
   "baseline": {
     "fd001": {
@@ -154,6 +279,11 @@
       "test_rmse_piecewise": 26.903665,
       "val_alert_lead_time_fraction": 0.75,
       "val_false_alerts_per_engine": 0.05
+    },
+    "vibration": {
+      "model": "random_forest",
+      "features": "rms, kurtosis, crest factor, fft band energies, envelope band energies, envelope fault-order peaks",
+      "test_macro_f1": 0.966768
     }
   },
   "splits": {
@@ -166,6 +296,11 @@
       "train": 80,
       "val": 20,
       "test": 100
+    },
+    "CWRU": {
+      "train": 970,
+      "val": 110,
+      "test": 360
     }
   },
   "seeds": [
@@ -177,7 +312,7 @@
     "gpu": null,
     "python": "3.12.10",
     "os": "Windows-11-10.0.26200-SP0",
-    "peak_rss_gb": 1.0109
+    "peak_rss_gb": 1.0032
   },
-  "runtime_seconds": 78.706
+  "runtime_seconds": 88.305
 }
