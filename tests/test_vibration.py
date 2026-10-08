@@ -87,8 +87,32 @@ def test_load_split_windows_do_not_share_samples():
     lengths = {item.file_id: 20_000 for item in RECORDINGS}
     rpms = {item.file_id: float(item.nominal_rpm) for item in RECORDINGS}
     document = build_split_document(RECORDINGS, lengths, rpms, 2048, 5, 12_000, 1)
-    assert set(document["train_recordings"]).isdisjoint(document["test_recordings"])
-    assert set(document["val_recordings"]).isdisjoint(document["test_recordings"])
+    train = document["train_recordings"]
+    val = document["val_recordings"]
+    test = document["test_recordings"]
+    assert set(train).isdisjoint(val)
+    assert set(train).isdisjoint(test)
+    assert set(val).isdisjoint(test)
+    assert (len(train), len(val), len(test)) == (20, 10, 10)
+    assert len(set(train) | set(val) | set(test)) == len(RECORDINGS)
+
+    def loads_of(ids: list[str]) -> set[int]:
+        return {document["recordings"][file_id]["load_hp"] for file_id in ids}
+
+    def labels_of(ids: list[str]) -> set[str]:
+        return {document["recordings"][file_id]["label"] for file_id in ids}
+
+    assert loads_of(train) == {0, 1, 2}
+    assert loads_of(val) == {0, 1}
+    assert loads_of(test) == {3}
+    assert labels_of(train) == set(CLASS_ORDER)
+    assert labels_of(val) == set(CLASS_ORDER)
+    assert labels_of(test) == set(CLASS_ORDER)
+    load2 = [item.file_id for item in RECORDINGS if item.load_hp == 2]
+    assert set(load2) <= set(train)
+    for info in document["recordings"].values():
+        assert info["split"] in {"train", "val", "test"}
+        assert {row[2] for row in info["windows"]} == {info["split"]}
     assert cross_split_overlap_count(document) == 0
     for file_id in document["test_recordings"]:
         assert document["recordings"][file_id]["load_hp"] == 3

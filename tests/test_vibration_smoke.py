@@ -21,7 +21,9 @@ def test_quick_vibration_writes_artifacts(tmp_path: Path):
     document = json.loads((tmp_path / "vibration_splits.json").read_text(encoding="utf-8"))
     for key in ("train_recordings", "val_recordings", "test_recordings"):
         assert key in document
+    assert set(document["train_recordings"]).isdisjoint(document["val_recordings"])
     assert set(document["train_recordings"]).isdisjoint(document["test_recordings"])
+    assert set(document["val_recordings"]).isdisjoint(document["test_recordings"])
     envelope = json.loads((tmp_path / "envelope_check.json").read_text(encoding="utf-8"))
     for key in ("bpfo_hz_theory", "bpfo_hz_detected", "rel_error"):
         assert key in envelope

@@ -53,7 +53,7 @@ Development engines are split by unit id, 20 percent validation, seed 0. The ass
 
 FD001 and FD003 each get their own models. FD003 has two fault modes, so one shared model would mix different sensor directions. Operating settings are rounded into a regime key and sensors are z-scored inside each regime using training rows only. Both of these files are the single sea-level condition with a little setting noise, so the key collapses to one regime and the step is training-set standardization. The same function keeps regimes apart when settings differ by whole units, which the tests check with synthetic data.
 
-Bearing recordings at 0 hp and 1 hp are training data. Each 2 hp recording is cut once: windows that end inside the first 70 percent of the file train, and windows that start in the last 30 percent validate. The 3 hp recordings are the test load. A window that would cross the 2 hp cut is dropped, so no window shares samples with a window in another split. That is the usual leakage path on this dataset when people cut overlapping windows and then shuffle them. The random forest sees RMS, excess kurtosis, crest factor, FFT band energies, envelope band energies, and envelope amplitude at the shaft, BPFO, BPFI, and ball-spin orders. The CNN sees the raw window after a per-window z-score. Neither model is fit on the test load, and the test load is not used to pick thresholds. The envelope check bandpasses 2 to 5 kHz, takes the Hilbert envelope, and finds the strongest peak between 2.5 and 5 times shaft speed. That band is wider than the theoretical outer-race frequency. The detected peak is then compared with BPFO from the SKF 6205-2RS geometry (9 balls, 0.3126 in ball diameter, 1.537 in pitch diameter).
+The 3 hp recordings are the test load. Each fault class holds out either its 0 hp or its 1 hp recording for validation, alternating by class, and trains on the other development recordings. Every 2 hp recording stays in training, because 1750 rpm is the development speed closest to the 1730 rpm test load. A recording is listed in only one split, so no window shares samples with a window in another split. That is the usual leakage path on this dataset when people cut overlapping windows from one file and then shuffle them. The random forest sees RMS, excess kurtosis, crest factor, FFT band energies, envelope band energies, and envelope amplitude at the shaft, BPFO, BPFI, and ball-spin orders. The CNN sees the raw window after a per-window z-score. Neither model is fit on the test load, and the test load is not used to pick thresholds. The envelope check bandpasses 2 to 5 kHz, takes the Hilbert envelope, and finds the strongest peak between 2.5 and 5 times shaft speed. That band is wider than the theoretical outer-race frequency. The detected peak is then compared with BPFO from the SKF 6205-2RS geometry (9 balls, 0.3126 in ball diameter, 1.537 in pitch diameter).
 
 The reported RUL is a validation-chosen blend of calibrated LightGBM and CNN forecasts. The calibrator is either a line or an isotonic map, and the blend weight is one of 0, 0.25, 0.5, 0.75, or 1. Both are fit only on validation cycles whose true remaining life is at most 25 cycles above the 125-cycle training clip. Isotonic regression is kept only when a split by validation engine beats the line. A health index uses the mean of train-signed sensor z-scores, and a second feature uses the worst sensor, so one fault mode does not cancel the other. A third feature is how close the current sensor deltas are to two end-of-life centroids fit on training engines only. Alert thresholds are a grid over validation engines only. A false alert is an episode that starts while true remaining life is still above 50 cycles. Lead time is the true remaining life at the first alert.
 
@@ -112,13 +112,13 @@ Alert lead time is the fraction of validation engines whose first alert has `rul
 | FD003 test RUL RMSE | 15.980509 | <= | 20.0 | yes |
 | Alert lead time | 1.0 | >= | 0.8 | yes |
 | False alerts | 0.0 | <= | 0.1 | yes |
-| Test coverage of src/ | 89.869484 | >= | 70.0 | yes |
-| Macro-F1 on held-out motor load (10 classes) | 0.971676 | >= | 0.9 | yes |
-| Best model vs. feature baseline | 0.971676 | >= | 0.95 | yes |
+| Test coverage of src/ | 89.558732 | >= | 70.0 | yes |
+| Macro-F1 on held-out motor load (10 classes) | 0.986092 | >= | 0.9 | yes |
+| Best model vs. feature baseline | 0.986092 | >= | 0.95 | yes |
 | Envelope fault-frequency check | 0.001866 | <= | 0.02 | yes |
 | No leakage | 0.0 | <= | 0.0 | yes |
 | Parent project | 0.0 | <= | 0.02 | yes |
-| Test coverage of src/ and vibration/ | 90.147992 | >= | 75.0 | yes |
+| Test coverage of src/ and vibration/ | 89.894292 | >= | 75.0 | yes |
 
 Validation engines: median lead time 34.5 cycles, mean lead time 35.35 cycles, 0.0 false alert episodes per engine.
 
@@ -129,14 +129,14 @@ Validation engines: median lead time 34.5 cycles, mean lead time 35.35 cycles, 0
 
 | Model | Held-out macro-F1 |
 |---|---:|
-| 1D CNN | 0.971676 |
-| Random forest | 0.966768 |
+| 1D CNN | 0.986092 |
+| Random forest | 0.975716 |
 
 Outer-race BPFO theory 107.304281 Hz, detected 107.504477 Hz, relative error 0.001866.
 Cross-split overlapping windows: 0.
 
-Runtime seconds: 88.305.
-Peak RSS GB: 1.0032.
+Runtime seconds: 85.048.
+Peak RSS GB: 0.9968.
 
 Every success criterion passed.
 <!-- RESULTS_END -->

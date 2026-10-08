@@ -35,7 +35,7 @@
     },
     {
       "name": "Test coverage of src/",
-      "value": 89.869484,
+      "value": 89.558732,
       "op": ">=",
       "threshold": 70.0,
       "threshold_high": null,
@@ -43,7 +43,7 @@
     },
     {
       "name": "Macro-F1 on held-out motor load (10 classes)",
-      "value": 0.971676,
+      "value": 0.986092,
       "op": ">=",
       "threshold": 0.9,
       "threshold_high": null,
@@ -51,7 +51,7 @@
     },
     {
       "name": "Best model vs. feature baseline",
-      "value": 0.971676,
+      "value": 0.986092,
       "op": ">=",
       "threshold": 0.95,
       "threshold_high": null,
@@ -83,7 +83,7 @@
     },
     {
       "name": "Test coverage of src/ and vibration/",
-      "value": 90.147992,
+      "value": 89.894292,
       "op": ">=",
       "threshold": 75.0,
       "threshold_high": null,
@@ -186,16 +186,16 @@
       "alert_median_lead_cycles": "34.50",
       "alert_engines_percent": "100.00",
       "false_alerts_per_engine": "0.0000",
-      "vibration_cnn_macro_f1": "0.9717",
-      "vibration_baseline_macro_f1": "0.9668",
-      "vibration_best_macro_f1": "0.9717",
+      "vibration_cnn_macro_f1": "0.9861",
+      "vibration_baseline_macro_f1": "0.9757",
+      "vibration_best_macro_f1": "0.9861",
       "vibration_bpfo_rel_error_percent": "0.19",
       "vibration_overlap_windows": "0",
       "vibration_test_load_hp": "3",
       "vibration_n_classes": "10"
     },
-    "coverage_src_percent": 89.869484,
-    "coverage_src_and_vibration_percent": 90.147992,
+    "coverage_src_percent": 89.558732,
+    "coverage_src_and_vibration_percent": 89.894292,
     "vibration": {
       "project": "predictive-maintenance-vibration",
       "quick": false,
@@ -212,12 +212,12 @@
         "ball_014",
         "ball_021"
       ],
-      "cnn_test_macro_f1": 0.971676,
-      "baseline_test_macro_f1": 0.966768,
-      "best_test_macro_f1": 0.971676,
+      "cnn_test_macro_f1": 0.986092,
+      "baseline_test_macro_f1": 0.975716,
+      "best_test_macro_f1": 0.986092,
       "best_model": "cnn",
-      "cnn_val_macro_f1": 1.0,
-      "cnn_epochs_ran": 7,
+      "cnn_val_macro_f1": 0.943272,
+      "cnn_epochs_ran": 8,
       "bpfo_hz_theory": 107.304281,
       "bpfo_hz_detected": 107.504477,
       "bpfo_rel_error": 0.001866,
@@ -225,10 +225,10 @@
       "overlap_windows": 0,
       "test_load_hp": 3,
       "device": "cpu",
-      "n_train_windows": 970,
-      "n_val_windows": 110,
+      "n_train_windows": 720,
+      "n_val_windows": 360,
       "n_test_windows": 360,
-      "n_train_recordings": 30,
+      "n_train_recordings": 20,
       "n_val_recordings": 10,
       "n_test_recordings": 10,
       "window_length": 2048,
@@ -283,7 +283,7 @@
     "vibration": {
       "model": "random_forest",
       "features": "rms, kurtosis, crest factor, fft band energies, envelope band energies, envelope fault-order peaks",
-      "test_macro_f1": 0.966768
+      "test_macro_f1": 0.975716
     }
   },
   "splits": {
@@ -298,8 +298,8 @@
       "test": 100
     },
     "CWRU": {
-      "train": 970,
-      "val": 110,
+      "train": 720,
+      "val": 360,
       "test": 360
     }
   },
@@ -312,7 +312,7 @@
     "gpu": null,
     "python": "3.12.10",
     "os": "Windows-11-10.0.26200-SP0",
-    "peak_rss_gb": 1.0032
+    "peak_rss_gb": 0.9968
   },
-  "runtime_seconds": 88.305
+  "runtime_seconds": 85.048
 }

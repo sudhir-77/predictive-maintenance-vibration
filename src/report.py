@@ -119,7 +119,7 @@ def _vibration_resume(headline: dict) -> str:
 - Classified {n_classes} bearing fault conditions from accelerometer signals with a one-dimensional CNN at {cnn} macro-F1 on an unseen motor load vs. {baseline} for a spectral-feature random forest.
 - Built FFT and envelope-spectrum features; the detected outer-race fault peak matched bearing-geometry BPFO within {bpfo}%.
 - Predicted remaining useful life on NASA C-MAPSS engine telemetry with LightGBM and a one-dimensional CNN, reaching {fd001} RMSE (cycles) on the official FD001 test set.
-- Assigned each CWRU recording to one motor-load split so cross-split sample overlap is {overlap} windows. The held-out load is {load_hp} hp.
+- Assigned each CWRU recording to one split so cross-split sample overlap is {overlap} windows. The held-out load is {load_hp} hp.
 
 ## Skills and tools
 
@@ -127,7 +127,7 @@ Python, SQL, DuckDB, NumPy, SciPy, scikit-learn, PyTorch, LightGBM, FFT, Hilbert
 
 ## Summary
 
-This project classifies drive-end bearing faults from public accelerometer recordings and predicts remaining useful life on NASA turbofan telemetry. Windows are split by motor load so neighboring samples cannot leak into the test set, and an envelope spectrum is checked against the outer-race fault frequency from the bearing geometry.
+This project classifies drive-end bearing faults from public accelerometer recordings and predicts remaining useful life on NASA turbofan telemetry. Each recording is assigned to one split so neighboring samples cannot leak into the test set, and an envelope spectrum is checked against the outer-race fault frequency from the bearing geometry.
 
 ## GitHub description
 

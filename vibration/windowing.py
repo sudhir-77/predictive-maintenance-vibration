@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from vibration.catalog import Recording
-from vibration.config import TEST_LOADS, TRAIN_LOADS, VAL_LOADS, VAL_LOAD_TRAIN_FRACTION
+from vibration.config import CLASS_ORDER, DEV_LOADS, TEST_LOADS, VAL_CANDIDATE_LOADS
 
 
 def window_length_for_rpm(rpm: float, sample_rate_hz: float, n_revs: int) -> int:
@@ -14,13 +14,24 @@ def window_length_for_rpm(rpm: float, sample_rate_hz: float, n_revs: int) -> int
 
 
 def split_for_load(load_hp: int) -> str:
-    if load_hp in TRAIN_LOADS:
-        return "train"
-    if load_hp in VAL_LOADS:
-        return "val"
+    """Return the split for a load that is not shared between train and validation."""
     if load_hp in TEST_LOADS:
         return "test"
-    raise ValueError(f"load {load_hp} hp is not in the train/val/test plan")
+    raise ValueError(f"load {load_hp} hp is split by recording, not by the whole load")
+
+
+def split_for_recording(label: str, load_hp: int) -> str:
+    """Put each development file in train or validation, and the test load aside."""
+    if load_hp in TEST_LOADS:
+        return "test"
+    if load_hp not in DEV_LOADS:
+        raise ValueError(f"load {load_hp} hp is not in the train/val/test plan")
+    if label not in CLASS_ORDER:
+        raise ValueError(f"unknown fault class {label}")
+    held_out = VAL_CANDIDATE_LOADS[CLASS_ORDER.index(label) % len(VAL_CANDIDATE_LOADS)]
+    if load_hp == held_out:
+        return "val"
+    return "train"
 
 
 def window_starts(n_samples: int, length: int, n_windows: int) -> list[int]:
@@ -46,24 +57,17 @@ def ranges_overlap(start_a: int, end_a: int, start_b: int, end_b: int) -> bool:
     return start_a < end_b and start_b < end_a
 
 
-def assign_window_splits(n_samples: int, length: int, n_windows: int, load_hp: int) -> list[list[int | str]]:
-    """Place windows for one recording. The 2 hp files are cut once, in time order."""
+def assign_window_splits(
+    n_samples: int,
+    length: int,
+    n_windows: int,
+    load_hp: int,
+    label: str,
+) -> list[list[int | str]]:
+    """Place every window from one recording into that recording's single split."""
+    split = split_for_recording(label, load_hp)
     starts = window_starts(n_samples, length, n_windows)
-    cut = int(VAL_LOAD_TRAIN_FRACTION * n_samples)
-    rows: list[list[int | str]] = []
-    for start in starts:
-        end = start + length
-        if load_hp in TRAIN_LOADS:
-            rows.append([start, end, "train"])
-        elif load_hp in TEST_LOADS:
-            rows.append([start, end, "test"])
-        elif load_hp in VAL_LOADS:
-            if end <= cut:
-                rows.append([start, end, "train"])
-            elif start >= cut:
-                rows.append([start, end, "val"])
-        else:
-            raise ValueError(f"load {load_hp} hp is not in the train/val/test plan")
+    rows = [[start, start + length, split] for start in starts]
     if not rows:
         raise ValueError(f"no windows fit in a {n_samples}-sample recording")
     return rows
@@ -111,10 +115,11 @@ def build_split_document(
             if window_length is None:
                 raise ValueError("window_length is required when n_revs is not set")
             length = int(window_length)
-        windows = assign_window_splits(n_samples, length, n_windows, spec.load_hp)
+        windows = assign_window_splits(n_samples, length, n_windows, spec.load_hp, spec.label)
         present = sorted({str(row[2]) for row in windows})
-        for name in present:
-            by_split[name].append(spec.file_id)
+        if len(present) != 1:
+            raise ValueError(f"recording {spec.file_id} spans splits {present}")
+        by_split[present[0]].append(spec.file_id)
         details[spec.file_id] = {
             "load_hp": spec.load_hp,
             "label": spec.label,
@@ -123,9 +128,21 @@ def build_split_document(
             "measured_rpm": None if rpm is None else float(rpm),
             "n_samples": n_samples,
             "window_length": length,
-            "split": present[0] if len(present) == 1 else "mixed",
+            "split": present[0],
             "windows": windows,
         }
+    train_ids = set(by_split["train"])
+    val_ids = set(by_split["val"])
+    test_ids = set(by_split["test"])
+    if (
+        len(train_ids) != len(by_split["train"])
+        or len(val_ids) != len(by_split["val"])
+        or len(test_ids) != len(by_split["test"])
+        or not train_ids.isdisjoint(val_ids)
+        or not train_ids.isdisjoint(test_ids)
+        or not val_ids.isdisjoint(test_ids)
+    ):
+        raise ValueError("train, validation, and test recordings must be disjoint")
     return {
         "version": version,
         "sample_rate_hz": sample_rate_hz,

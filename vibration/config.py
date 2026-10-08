@@ -6,9 +6,10 @@ SEED = 0
 SAMPLE_RATE_HZ = 12_000
 WINDOW_LENGTH = 2048
 N_WINDOWS = 36
-# On the 2 hp recordings, the first portion trains and the tail validates.
-# The cut is fixed so windows cannot share samples across those splits.
-VAL_LOAD_TRAIN_FRACTION = 0.70
+# Load 3 hp is the test set. Loads 0-2 hp are development data, and each file
+# is placed in train or validation, never both. The 2 hp recordings stay in
+# training: 1750 rpm is the development speed closest to the 1730 rpm test load.
+# Validation alternates between the 0 hp and 1 hp recording of each fault class.
 N_FFT_BANDS = 8
 N_ENVELOPE_BANDS = 8
 ENVELOPE_BAND_HZ = 500.0
@@ -36,10 +37,10 @@ CLASS_ORDER = (
     "ball_021",
 )
 
-TRAIN_LOADS = (0, 1)
-VAL_LOADS = (2,)
+DEV_LOADS = (0, 1, 2)
+VAL_CANDIDATE_LOADS = (0, 1)
 TEST_LOADS = (3,)
-SPLIT_VERSION = 1
+SPLIT_VERSION = 3
 
 RF_TREES = 200
 RF_MAX_DEPTH = 24
